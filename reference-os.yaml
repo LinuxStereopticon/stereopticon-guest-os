@@ -21,6 +21,11 @@ actions:
     description: Full upgrade
     command: apt update && apt full-upgrade -y
 
+  - action: run
+    chroot: true
+    description: Full upgrade
+    command: apt install -y initramfs-tools
+
 {{ if eq $architecture "arm64" }}
   - action: run
     chroot: true
