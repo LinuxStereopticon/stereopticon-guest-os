@@ -83,11 +83,7 @@ actions:
 {{ if eq $architecture "amd64" }}
   - action: run
     chroot: true
-    command: grub-install /dev/vda --target=i386-pc
-
-  - action: run
-    chroot: true
-    command: grub-install --target=x86_64-efi --no-nvram --removable
+    command: grub-install --target=x86_64-efi --no-nvram
 {{ end }}
 
 {{ if eq $architecture "arm64" }}
