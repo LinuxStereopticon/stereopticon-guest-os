@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -x
+LOCATION="$(dirname "$(readlink -f "$0")")"
+IMAGE="local/debos-stereopticon:1"
+
+if [ -z $NOINTERACTIVE ]; then
+        INTERACTIVE_ARG='--interactive'
+else
+        INTERACTIVE_ARG=''
+fi
+
+if ! docker inspect --type=image ${IMAGE} > /dev/null 2>&1; then
+	docker build -t ${IMAGE} ${LOCATION} -f ${LOCATION}/Dockerfile
+fi
+
+if [ -e /dev/kvm ]; then
+	KVM_ARGS="--device /dev/kvm --group-add=$(getent group kvm | cut -d : -f 3)"
+else
+	KVM_ARGS=""
+fi
+
+docker run --net=host --rm $INTERACTIVE_ARG --tty \
+        --user $(id -u) \
+        --workdir /recipes \
+        $KVM_ARGS \
+        --mount "type=bind,source=$(pwd),destination=/recipes" --security-opt label=disable ${IMAGE} "$@"
