@@ -1,0 +1,92 @@
+{{- $architecture := or .architecture "arm64" -}}
+{{- $image := or .image (printf "reference-os-%s.qcow2" $architecture) -}}
+{{- $cdimagesmirror := or .cdimagesmirror "http://cdimage.ubuntu.com" -}}
+
+architecture: {{ $architecture }}
+actions:
+  - action: download
+    description: Grab base Ubuntu image
+    url: "{{ $cdimagesmirror }}/ubuntu-base/releases/focal/release/ubuntu-base-20.04.3-base-{{ $architecture }}.tar.gz"
+    unpack: false
+    filename: ubuntu-base.tar.gz
+    name: ubuntu-base.tar.gz
+
+  - action: unpack
+    description: Unpacking rootfs
+    origin: ubuntu-base.tar.gz
+    compression: gz
+
+  - action: run
+    chroot: true
+    description: Setting default password for root user
+    command: echo root:root | chpasswd
+
+{{ if eq $architecture "arm64" }}
+  - action: run
+    chroot: true
+    description: Install arm64 GRUB
+    command: apt install -y grub-efi-arm64 grub-efi-arm64-bin
+{{ end }}
+
+{{ if eq $architecture "amd64" }}
+  - action: run
+    chroot: true
+    description: Install amd64 GRUB
+    command: apt install -y grub-pc-bin grub-efi-amd64-signed shim-signed
+{{ end }}
+
+  - action: run
+    chroot: true
+    description: Create default user
+    command: groupadd -g 1000 user && useradd -g 1000 -u 1000 -m user && passwd -d user && usermod -s /bin/bash user
+
+  - action: image-partition
+    description: Creating image
+    imagename: {{ $image }}
+    imagesize: 15GB
+    partitiontype: msdos
+    mountpoints:
+      - mountpoint: /
+        partition: rootfs
+      - mountpoint: /boot
+        partition: boot
+      - mountpoint: /boot/efi
+        partition: efi
+    partitions:
+      - name: efi
+        fs: vfat
+        start: 1M
+        end: 200MB
+        parttype: EF
+        flags: [ esp ]
+      - name: boot
+        fs: ext2
+        start: 200MB
+        end: 500MB
+      - name: rootfs
+        fs: ext4
+        start: 500MB
+        end: 100%
+
+  - action: filesystem-deploy
+    description: Deploying filesystem into image
+
+  - action: run
+    chroot: true
+    command: update-grub && update-initramfs -u
+
+{{ if eq $architecture "amd64" }}
+  - action: run
+    chroot: true
+    command: grub-install /dev/vda --target=i386-pc
+
+  - action: run
+    chroot: true
+    command: grub-install --target=x86_64-efi --no-nvram --removable
+{{ end }}
+
+{{ if eq $architecture "arm64" }}
+  - action: run
+    chroot: true
+    command: grub-install --target=arm64-efi --no-nvram
+{{ end }}
