@@ -16,11 +16,6 @@ actions:
     origin: ubuntu-base.tar.gz
     compression: gz
 
-  - action: run
-    chroot: true
-    description: Setting default password for root user
-    command: echo root:root | chpasswd
-
 {{ if eq $architecture "arm64" }}
   - action: run
     chroot: true
