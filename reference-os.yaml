@@ -1,5 +1,5 @@
 {{- $architecture := or .architecture "arm64" -}}
-{{- $image := or .image (printf "reference-os-%s.qcow2" $architecture) -}}
+{{- $image := or .image (printf "reference-os-%s.img" $architecture) -}}
 {{- $cdimagesmirror := or .cdimagesmirror "http://cdimage.ubuntu.com" -}}
 
 architecture: {{ $architecture }}
