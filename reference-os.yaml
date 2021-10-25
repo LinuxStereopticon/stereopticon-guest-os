@@ -16,6 +16,11 @@ actions:
     origin: ubuntu-base.tar.gz
     compression: gz
 
+  - action: run
+    chroot: true
+    description: Full upgrade
+    command: apt update && apt full-upgrade -y
+
 {{ if eq $architecture "arm64" }}
   - action: run
     chroot: true
