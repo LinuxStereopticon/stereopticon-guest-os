@@ -1,12 +1,12 @@
 {{- $architecture := or .architecture "arm64" -}}
 {{- $image := or .image (printf "reference-os-%s.img" $architecture) -}}
-{{- $cdimagesmirror := or .cdimagesmirror "http://cdimage.ubuntu.com" -}}
+{{- $cdimagesmirror := or .cdimagesmirror "https://cdimage.ubuntu.com" -}}
 
 architecture: {{ $architecture }}
 actions:
   - action: download
     description: Grab base Ubuntu image
-    url: "{{ $cdimagesmirror }}/ubuntu-base/releases/focal/release/ubuntu-base-20.04.3-base-{{ $architecture }}.tar.gz"
+    url: "{{ $cdimagesmirror }}/ubuntu-base/daily/current/jammy-base-{{ $architecture }}.tar.gz"
     unpack: false
     filename: ubuntu-base.tar.gz
     name: ubuntu-base.tar.gz
