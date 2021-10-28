@@ -36,6 +36,11 @@ actions:
     description: App store experience for Linux GUI apps
     command: apt install -y gnome-software-plugin-flatpak gnome-software-plugin-snap
 
+  - action: run
+    chroot: true
+    description: Clean apt cache
+    command: apt clean
+
 {{ if eq $architecture "arm64" }}
   - action: run
     chroot: true
