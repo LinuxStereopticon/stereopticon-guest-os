@@ -23,8 +23,18 @@ actions:
 
   - action: run
     chroot: true
-    description: Full upgrade
+    description: initramfs tools
     command: apt install -y initramfs-tools
+
+  - action: run
+    chroot: true
+    description: Package format support
+    command: apt install -y snapd flatpak
+
+  - action: run
+    chroot: true
+    description: App store experience for Linux GUI apps
+    command: apt install -y gnome-software-plugin-flatpak gnome-software-plugin-snap
 
 {{ if eq $architecture "arm64" }}
   - action: run
