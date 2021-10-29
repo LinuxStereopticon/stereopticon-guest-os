@@ -34,12 +34,7 @@ actions:
   - action: run
     chroot: true
     description: App store experience for Linux GUI apps
-    command: apt install -y gnome-software-plugin-flatpak gnome-software-plugin-snap
-
-  - action: run
-    chroot: true
-    description: Clean apt cache
-    command: apt clean
+    command: apt install -y --no-install-recommends gnome-software-plugin-flatpak gnome-software-plugin-snap
 
 {{ if eq $architecture "arm64" }}
   - action: run
@@ -54,6 +49,16 @@ actions:
     description: Install amd64 GRUB
     command: apt install -y grub-pc-bin grub-efi-amd64-signed shim-signed
 {{ end }}
+
+  - action: run
+    chroot: true
+    description: Install the latest available kernel
+    command: apt install -y linux-image-generic
+
+  - action: run
+    chroot: true
+    description: Clean apt cache
+    command: apt clean
 
   - action: run
     chroot: true
